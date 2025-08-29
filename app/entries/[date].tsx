@@ -1,9 +1,12 @@
+import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Calendar() {
+export default function DatedEntry() {
+  const { date } = useLocalSearchParams();
+
   return (
     <View style={styles.container}>
-      <Text>Forgetting Priorities</Text>
+      <Text>This is a blank entry</Text>
     </View>
   );
 }
