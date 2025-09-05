@@ -11,9 +11,8 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(localToday);
 
   const fasterScale = {
-    "2025-08-02": "R",
+    "2025-09-02": "R",
     "2025-08-01": "F",
-    // "2025-08-07": "A",
     "2025-08-14": "S",
     "2025-08-21": "T",
     "2025-08-28": "E",
@@ -22,8 +21,20 @@ export default function CalendarPage() {
 
   return (
     <View style={styles.container}>
-      <Text>Select a Date</Text>
+      <Text style={styles.headerText}>Select a Date</Text>
       <Calendar
+        style={styles.calendar}
+        hideExtraDays={true}
+        theme={{
+          "stylesheet.calendar.main": {
+            week: {
+              marginVertical: 0, // remove vertical padding
+              flexDirection: "row",
+              justifyContent: "space-around",
+              height: 60, // tweak this value until it matches your cells
+            },
+          },
+        }}
         dayComponent={({ date, state }) => {
           if (!date) return null;
           const isSelected = date.dateString === selectedDate;
@@ -32,53 +43,54 @@ export default function CalendarPage() {
               onPress={() => setSelectedDate(date.dateString)}
               style={[styles.dayContainer, isSelected && styles.selectedDate]}
             >
-              <View style={styles.days}>
-                <Text
-                  style={[
-                    styles.dayText,
-                    state === "disabled" && styles.disabledText,
-                    isSelected && styles.selectedDateText,
-                  ]}
-                >
-                  {date.day}
-                </Text>
+              <Text
+                style={[styles.dayText, isSelected && styles.selectedDateText]}
+              >
+                {date.day}
+              </Text>
 
-                <Text style={styles.symbolText}>
-                  {fasterScale[date.dateString] || ""}
-                </Text>
-              </View>
+              <Text
+                style={[
+                  styles.symbolText,
+                  isSelected && styles.selectedSymbolText,
+                ]}
+              >
+                {fasterScale[date.dateString] || ""}
+              </Text>
             </Pressable>
           );
         }}
       />
+      <Text style={styles.headerText}>{selectedDate}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
+    width: "95%",
+    alignItems: "stretch",
+    alignSelf: "center",
+  },
+  headerText: {
+    textAlign: "center",
+    fontSize: 20,
     padding: 10,
-    alignItems: "center",
-    justifyContent: "flex-start",
+  },
+  calendar: {
+    width: "100%",
   },
   dayContainer: {
+    width: "100%",
+    height: 60,
     alignItems: "center",
     justifyContent: "center",
-    width: 30,
-    height: 40,
-  },
-  days: {
-    alignItems: "center",
-    justifyContent: "center",
+    borderWidth: 0.5,
+    borderColor: "gray",
   },
   dayText: {
     fontSize: 16,
     color: "#000",
-  },
-  disabledText: {
-    color: "gray",
   },
   symbolText: {
     fontSize: 12,
@@ -87,9 +99,9 @@ const styles = StyleSheet.create({
   },
   selectedDate: {
     backgroundColor: "#77aafdff",
-    borderRadius: 5,
-    width: 40,
-    height: 40,
+    borderRadius: 8,
+    width: "100%",
+    height: 60,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -97,9 +109,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  selectedText: {
-    marginTop: 20,
-    fontSize: 18,
-    textAlign: "center",
+  selectedSymbolText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
