@@ -1,20 +1,110 @@
-import { useLocalSearchParams } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { CheckboxGroup } from "./CheckboxGroup";
 
-export default function DatedEntry() {
-  const { date } = useLocalSearchParams();
-
-  return (
-    <View style={styles.container}>
-      <Text>This is a blank entry</Text>
-    </View>
-  );
+interface FormValues {
+  checkboxGroup: string[];
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+type StoredEntry = {
+  levels: string[];
+  createdAt: string;
+};
+
+function makeOption(label: string, level: string) {
+  return {
+    label,
+    value: `${level}-${label}`,
+    level,
+  };
+}
+
+const levelOptions = [
+  makeOption("No current secrets", "G"),
+  makeOption("Working to solve problems", "G"),
+  makeOption("Secrets", "F"),
+  makeOption("Sarcasm", "F"),
+  makeOption("Being Resentful", "A"),
+  makeOption("Perfectionism", "A"),
+  makeOption("Feeling Driven", "S"),
+  makeOption("Irritable", "S"),
+  makeOption("Increasing Sarcasm", "T"),
+  makeOption("Feeling Alone", "T"),
+  makeOption("Depressed", "E"),
+  makeOption("Panicked", "E"),
+  makeOption("Out of Control", "R"),
+  makeOption("Giving Up and Giving In", "R"),
+];
+
+export default function EntryForm() {
+  const { date } = useLocalSearchParams();
+  const router = useRouter();
+  const { control, handleSubmit, reset } = useForm<FormValues>({
+    mode: "all",
+    defaultValues: {
+      checkboxGroup: [],
+    },
+  });
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const saved = await AsyncStorage.getItem("entries");
+        const entries: Record<string, StoredEntry> = saved
+          ? JSON.parse(saved)
+          : {};
+        const existingEntry = entries[date as string];
+        if (existingEntry) {
+          // Populate form with existing entry levels
+          reset({ checkboxGroup: existingEntry.levels });
+        }
+      } catch (error) {
+        console.error("Error loading entry:", error);
+      }
+    }
+
+    if (date) loadData();
+  }, [date, reset]);
+
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    const shortendedLevels = data.checkboxGroup.map((item) => item.charAt(0));
+    const uniqueLevels = Array.from(new Set(shortendedLevels));
+    const newEntry: StoredEntry = {
+      levels: uniqueLevels,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      const saved = await AsyncStorage.getItem("entries");
+      const entries = saved
+        ? (JSON.parse(saved) as Record<string, StoredEntry>)
+        : {};
+      entries[date as string] = newEntry;
+      await AsyncStorage.setItem("entries", JSON.stringify(entries));
+      router.replace("/calendar");
+      console.log("Submitted:", data);
+    } catch (error) {
+      console.error("Error saving entry:", error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <h1>FASTER Scale</h1>
+
+      <CheckboxGroup
+        control={control}
+        name="checkboxGroup"
+        label="Pick at least 1"
+        options={levelOptions}
+        row
+      />
+
+      <br />
+
+      <input type="submit" value="Save Entry" />
+    </form>
+  );
+}
