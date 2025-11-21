@@ -1,6 +1,7 @@
 //----Useful CLI Commands----//
 npx expo start = launch build environment
 eas build --platform android --profile test = build installable apk
+adb logcat *:S ReactNative:V ReactNativeJS:V = debug apk
 
 # Welcome to your Expo app 👋
 

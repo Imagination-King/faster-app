@@ -4,24 +4,14 @@ import { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "June",
-  "July",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+// prettier-ignore
+const MONTHS = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 
-const order = ["R", "E", "T", "S", "A", "F", "G"]; // from highest severity to lowest
+const order = ["R", "E", "T", "S", "A", "F", "G"]; // lowest to highest
 function lowestLetter(levels: string[]) {
-  //console.log("LowestLetter called with: ", levels);
+  // prettier-ignore
+  if(__DEV__) { console.log("LowestLetter called with: ", levels); }
+
   for (const letter of order) {
     if (levels.includes(letter)) return letter;
   }
@@ -51,7 +41,10 @@ export default function CalendarPage() {
         try {
           const saved = await AsyncStorage.getItem("entries");
           const parsed = saved ? JSON.parse(saved) : {};
-          //console.log("Loaded entries:", parsed);
+
+          // prettier-ignore
+          if(__DEV__) { console.log("Loaded entries:", parsed); }
+
           setEntries(parsed);
         } catch (err) {
           console.error("Error loading entries:", err);
@@ -101,7 +94,9 @@ export default function CalendarPage() {
     return map[level] || level;
   }
 
-  console.log("Current entry for", selectedDate, currentEntry);
+  // prettier-ignore
+  if (__DEV__){ console.log("Current entry for", selectedDate, currentEntry);}
+
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Select a Date</Text>
@@ -125,14 +120,8 @@ export default function CalendarPage() {
           const entry = entries[date.dateString];
           // grab first letter of entry
           const letter = entry ? lowestLetter(entry.levels) : "";
-          console.log(
-            "Day:",
-            date.dateString,
-            "Letter:",
-            letter,
-            "Levels:",
-            entry?.levels
-          );
+          // prettier-ignore
+          if (__DEV__) { console.log("Day:",date.dateString,"Letter:",letter,"Levels:",entry?.levels); }
 
           return (
             <Pressable

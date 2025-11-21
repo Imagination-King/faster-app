@@ -1,5 +1,7 @@
+import { Checkbox } from "expo-checkbox";
 import React from "react";
 import { Control, Controller } from "react-hook-form";
+import { StyleSheet, Text, View } from "react-native";
 
 interface Option {
   label: string;
@@ -22,8 +24,8 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   row,
 }) => {
   return (
-    <div style={{ display: row ? "flex" : "block", gap: "1rem" }}>
-      {label && <p>{label}</p>}
+    <View style={[row ? styles.rowContainer : styles.columnContainer]}>
+      {label && <Text style={styles.label}>{label}</Text>}
 
       <Controller
         name={name}
@@ -34,42 +36,62 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
             "Please select at least 1",
         }}
         render={({ field, fieldState }) => (
-          <div>
+          <View>
             {options.map((opt) => {
               const checked =
                 Array.isArray(field.value) && field.value.includes(opt.value);
 
               return (
-                <label
-                  key={`${opt.value}-${opt.label}`}
-                  style={{
-                    marginRight: "1rem",
-                    display: row ? "inline-block" : "block",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    value={opt.value}
-                    checked={checked}
-                    onChange={(e) => {
-                      const newValue = e.target.checked
+                <View key={`${opt.value}-${opt.label}`} style={styles.option}>
+                  <Checkbox
+                    value={checked}
+                    onValueChange={(newChecked) => {
+                      const newValue = newChecked
                         ? [...field.value, opt.value]
                         : field.value.filter((v: string) => v !== opt.value);
-
                       field.onChange(newValue);
                     }}
                   />
-                  {opt.label}
-                </label>
+                  <Text style={styles.optionLabel}>{opt.label}</Text>
+                </View>
               );
             })}
 
             {fieldState.error && (
-              <p style={{ color: "red" }}>{fieldState.error.message}</p>
+              <Text style={styles.error}>{fieldState.error.message}</Text>
             )}
-          </div>
+          </View>
         )}
       />
-    </div>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  rowContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
+  },
+  columnContainer: {
+    flexDirection: "column",
+    gap: 16,
+  },
+  label: {
+    marginBottom: 8,
+    fontWeight: "bold",
+  },
+  option: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 16,
+    marginBottom: 8,
+  },
+  optionLabel: {
+    marginLeft: 8,
+  },
+  error: {
+    color: "red",
+    marginTop: 4,
+  },
+});

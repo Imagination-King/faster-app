@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CheckboxGroup } from "./CheckboxGroup";
 
 interface FormValues {
@@ -91,8 +92,8 @@ export default function EntryForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <h1>FASTER Scale</h1>
+    <View>
+      <Text style={styles.formTitle}>FASTER Scale</Text>
 
       <CheckboxGroup
         control={control}
@@ -102,9 +103,26 @@ export default function EntryForm() {
         row
       />
 
-      <br />
-
-      <input type="submit" value="Save Entry" />
-    </form>
+      <Pressable onPress={handleSubmit(onSubmit)} style={styles.button}>
+        <Text style={styles.buttonText}>Save Entry</Text>
+      </Pressable>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  formTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  button: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#007AFF",
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+});
