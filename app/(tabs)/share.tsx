@@ -1,8 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useOrientation } from "../../hooks/useOrientation";
 
 export default function Calendar() {
+  const orientation = useOrientation();
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { flexDirection: orientation === "landscape" ? "row" : "column" },
+      ]}
+    >
       <Text>This is where the share feature goes</Text>
     </View>
   );

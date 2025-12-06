@@ -3,6 +3,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
+import { useOrientation } from "../../hooks/useOrientation";
 
 // prettier-ignore
 const MONTHS = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
@@ -18,14 +19,28 @@ function lowestLetter(levels: string[]) {
   return "";
 }
 
+function groupOptionsByLevel(options: string[]) {
+  const grouped: Record<string, string[]> = {};
+  for (const o of options) {
+    const [level, label] = o.split("-");
+    if (!grouped[level]) {
+      grouped[level] = [];
+    }
+    grouped[level].push(label);
+  }
+  return grouped;
+}
+
 type StoredEntry = {
   levels: string[];
+  options: string[];
   createdAt: string;
 };
 
 export default function CalendarPage() {
   //Setting default day to today (local time)
   const today = new Date();
+  const orientation = useOrientation();
 
   const localToday = `${today.getFullYear()}-${String(
     today.getMonth() + 1
@@ -100,52 +115,63 @@ export default function CalendarPage() {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Select a Date</Text>
-      <Calendar
-        style={styles.calendar}
-        hideExtraDays={true}
-        // overide default styles from Calendar
-        theme={{
-          "stylesheet.calendar.main": {
-            week: {
-              marginVertical: 0,
-              flexDirection: "row",
-              justifyContent: "space-around",
-              height: 60,
+      <View
+        style={
+          orientation === "landscape"
+            ? styles.landscapeContent
+            : styles.portraitContent
+        }
+      >
+        <Calendar
+          style={styles.calendar}
+          hideExtraDays={true}
+          // overide default styles from Calendar
+          theme={{
+            "stylesheet.calendar.main": {
+              week: {
+                marginVertical: 0,
+                flexDirection: "row",
+                justifyContent: "space-around",
+                height: 60,
+              },
             },
-          },
-        }}
-        dayComponent={({ date }) => {
-          if (!date) return null;
-          const isSelected = date.dateString === selectedDate;
-          const entry = entries[date.dateString];
-          // grab first letter of entry
-          const letter = entry ? lowestLetter(entry.levels) : "";
-          // prettier-ignore
-          if (__DEV__) { console.log("Day:",date.dateString,"Letter:",letter,"Levels:",entry?.levels); }
+          }}
+          dayComponent={({ date }) => {
+            if (!date) return null;
+            const isSelected = date.dateString === selectedDate;
+            const entry = entries[date.dateString];
+            // grab first letter of entry
+            const letter = entry ? lowestLetter(entry.levels) : "";
+            // prettier-ignore
+            if (__DEV__) { console.log("Day:",date.dateString,"Letter:",letter,"Levels:",entry?.levels); }
 
-          return (
-            <Pressable
-              onPress={() => setSelectedDate(date.dateString)}
-              style={[styles.dayContainer, isSelected && styles.selectedDate]}
-            >
-              <Text
-                style={[styles.dayText, isSelected && styles.selectedDateText]}
+            return (
+              <Pressable
+                onPress={() => setSelectedDate(date.dateString)}
+                style={[styles.dayContainer, isSelected && styles.selectedDate]}
               >
-                {date.day}
-              </Text>
+                <Text
+                  style={[
+                    styles.dayText,
+                    isSelected && styles.selectedDateText,
+                  ]}
+                >
+                  {date.day}
+                </Text>
 
-              <Text
-                style={[
-                  styles.symbolText,
-                  isSelected && styles.selectedSymbolText,
-                ]}
-              >
-                {letter}
-              </Text>
-            </Pressable>
-          );
-        }}
-      />
+                <Text
+                  style={[
+                    styles.symbolText,
+                    isSelected && styles.selectedSymbolText,
+                  ]}
+                >
+                  {letter}
+                </Text>
+              </Pressable>
+            );
+          }}
+        />
+      </View>
       <Text style={styles.headerText}>{formatDate(selectedDate)}</Text>
       <View style={styles.buttonRow}>
         {!currentEntry ? (
@@ -197,9 +223,25 @@ export default function CalendarPage() {
           <Text>
             Lowest Level: {prettyLabel(lowestLetter(currentEntry.levels))}
           </Text>
-          <Text>
-            Complete Scale: {currentEntry.levels.map(prettyLabel).join(", ")}
+          <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+            Complete Scale:
           </Text>
+          {order.map((level) => {
+            const grouped = groupOptionsByLevel(currentEntry.options);
+            const optionsForLevel = grouped[level] || [];
+            if (optionsForLevel.length === 0) return null;
+
+            return (
+              <View key={level} style={{ marginVertical: 6 }}>
+                <Text style={{ fontWeight: "bold" }}>{prettyLabel(level)}</Text>
+                {optionsForLevel.map((opt, idx) => (
+                  <Text key={idx} style={{ marginLeft: 12 }}>
+                    • {opt}
+                  </Text>
+                ))}
+              </View>
+            );
+          })}
         </View>
       ) : (
         <Text>No entry for this date yet.</Text>
@@ -279,5 +321,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginVertical: 10,
+  },
+  portraitContent: {
+    width: "100%",
+    maxHeight: "60%",
+  },
+  landscapeContent: {
+    width: "100%",
+    maxHeight: "70%",
   },
 });

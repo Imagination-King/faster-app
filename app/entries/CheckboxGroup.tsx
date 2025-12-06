@@ -2,6 +2,7 @@ import { Checkbox } from "expo-checkbox";
 import React from "react";
 import { Control, Controller } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
+import { useOrientation } from "../../hooks/useOrientation";
 
 interface Option {
   label: string;
@@ -23,8 +24,11 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   options,
   row,
 }) => {
+  const orientation = useOrientation();
+  const shouldUseRow = row && orientation !== "landscape";
+  
   return (
-    <View style={[row ? styles.rowContainer : styles.columnContainer]}>
+    <View style={[shouldUseRow ? styles.rowContainer : styles.columnContainer]}>
       {label && <Text style={styles.label}>{label}</Text>}
 
       <Controller
