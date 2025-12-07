@@ -1,55 +1,41 @@
+<!--
 //----Useful CLI Commands----//
 npx expo start = launch build environment
 eas build --platform android --profile test = build installable apk
-adb logcat *:S ReactNative:V ReactNativeJS:V = debug apk
+adb logcat \*:S ReactNative:V ReactNativeJS:V = debug apk
+-->
 
-# Welcome to your Expo app 👋
+# FASTER Scale Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+_This app is based off of the FASTER Scale created by Pure Desire Ministries. I am not affiliated in any way with Pure Desire, and the content of this app has not been officially licensed or endorsed by Pure Desire (yet)._
 
-## Get started
 
-1. Install dependencies
+### **This app is a work in progress. Any part of it is liable to change during the development process. Use at your own discretion**
 
-   ```bash
-   npm install
-   ```
+## Overview
 
-2. Start the app
+&nbsp;&nbsp;&nbsp;&nbsp;The FASTER* Mobile Tracker, henceforth referred to as “app,” is designed to be an accountability tool to help those on the path to recovery from addiction. The content itself is largely based on the FASTER Scale created and used by Pure Desire in their recovery curriculums. This app is designed to be an easy way for people to access and maintain a log of their FASTER Scale entries on their cell phones or tablets that can be easily shared with their accountability partners.
 
-   ```bash
-   npx expo start
-   ```
+&nbsp;&nbsp;&nbsp;&nbsp;I am building this app because I feel it would be useful in my own recovery journey, and when bringing up the idea to my own accountability partners, they have expressed interest as well, so I feel like the audience is definitely there.
 
-In the output, you'll find options to open the app in a
+* FASTER is an acronym that stands for “Forgetting Priorities,” “Anxiety,” “Speeding Up,” “Ticked Off,” “Exhausted,” and “Relapse.” These seven levels are supposed to help a recovering addict figure out what their current mental state is, and pinpoint how they can get back to living in “Restoration” (the silent, invisible ‘R’ at the beginning of FASTER).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Installation
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+&nbsp;&nbsp;&nbsp;&nbsp;You can find the latest APK in [Releases](https://github.com/Imagination-King/faster-app/releases). Simply download it and install it on your preferred (Android) device. Ignore any warnings about untrusted apps, though you're free to let your device scan the app if you want to. I promise I haven't included any viruses.
 
-## Get a fresh project
+There is currently no support for iOS devices, though I do plan on adding it at some point.
 
-When you're ready, run:
+## Using the App
 
-```bash
-npm run reset-project
-```
+&nbsp;&nbsp;&nbsp;&nbsp;You can't really do much with the app right now since it's still pretty early in development, but you can view the calendar, select any date you want, click the Add Entry button, and fill out the form. After submitting your entry, you can go back to the calendar, view any entries you've added, edit them if you missed something, and even delete them if you really want to (though that kind of defeats the point of an accountability app, don't you think?).
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+&nbsp;&nbsp;&nbsp;&nbsp;After you submit entries, you can also view the lowest level you reached for that day (represented by the little letters on the calendar) and you can view the full entry by selecting the date again and looking below the calendar.
 
-## Learn more
+&nbsp;&nbsp;&nbsp;&nbsp;At some point in the future, you'll be able to share your progress with your friends and see their progress, but for now, just be satisfied with seeing your own progress.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Feedback
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+&nbsp;&nbsp;&nbsp;&nbsp;Please send your feedback! It is much appreciated!
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+&nbsp;&nbsp;&nbsp;&nbsp;I do, at some point, plan on including a built-in feedback feature, but for now, feel free to reach out to me with any questions, concerns, reviews, whatever. You should be able to find my email in my GitHub profile, but if you can't find it (or don't want to go to the effort), then it's alexhamilton.code@gmail.com
