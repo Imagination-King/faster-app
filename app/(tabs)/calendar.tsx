@@ -1,20 +1,20 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, Text, UIManager, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useOrientation } from "../../hooks/useOrientation";
 
 // prettier-ignore
 const MONTHS = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 
-const order = ["R", "E", "T", "S", "A", "F", "G"]; // lowest to highest
+const order = ["G", "F", "A", "S", "T", "E", "R"];
 function lowestLetter(levels: string[]) {
   // prettier-ignore
   if(__DEV__) { console.log("LowestLetter called with: ", levels); }
 
-  for (const letter of order) {
-    if (levels.includes(letter)) return letter;
+  for (let i = order.length - 1; i >= 0; i--) {
+    if (levels.includes(order[i])) return order[i]; // go through the array from lowest to highest, finding first match
   }
   return "";
 }
@@ -38,9 +38,20 @@ type StoredEntry = {
 };
 
 export default function CalendarPage() {
-  //Setting default day to today (local time)
-  const today = new Date();
-  const orientation = useOrientation();
+  const today = new Date(); //Set default day to today (local time)
+  const orientation = useOrientation(); // for layout adjustments
+
+  // Enable LayoutAnimation on Android, animate orientation changes
+  useEffect(() => {
+    if(Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental){
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
+
+  // Animate layout changes when orientation changes
+  useEffect(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, [orientation]);
 
   const localToday = `${today.getFullYear()}-${String(
     today.getMonth() + 1
@@ -73,7 +84,7 @@ export default function CalendarPage() {
   // pull entry for current date
   const currentEntry = entries[selectedDate];
 
-  // convert date from YYYY-MM-DD to something more readable
+  // convert date from YYYY-MM-DD to MMM DD, YYYY
   function formatDate(
     input: string | { year: number; month: number; day: number }
   ) {
@@ -113,7 +124,10 @@ export default function CalendarPage() {
   if (__DEV__){ console.log("Current entry for", selectedDate, currentEntry);}
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <Text style={styles.headerText}>Select a Date</Text>
       <View
         style={
@@ -226,35 +240,44 @@ export default function CalendarPage() {
           <Text style={{ marginTop: 10, fontWeight: "bold" }}>
             Complete Scale:
           </Text>
-          {order.map((level) => {
-            const grouped = groupOptionsByLevel(currentEntry.options);
-            const optionsForLevel = grouped[level] || [];
-            if (optionsForLevel.length === 0) return null;
 
-            return (
-              <View key={level} style={{ marginVertical: 6 }}>
-                <Text style={{ fontWeight: "bold" }}>{prettyLabel(level)}</Text>
-                {optionsForLevel.map((opt, idx) => (
-                  <Text key={idx} style={{ marginLeft: 12 }}>
-                    • {opt}
+          {(() => {
+            const grouped = groupOptionsByLevel(currentEntry.options);
+            return order.map((level) => {
+              const optionsForLevel = grouped[level] || [];
+              if (optionsForLevel.length === 0) return null;
+
+              return (
+                <View key={level} style={{ marginVertical: 6 }}>
+                  <Text style={{ fontWeight: "bold" }}>
+                    {prettyLabel(level)}
                   </Text>
-                ))}
-              </View>
-            );
-          })}
+                  {optionsForLevel.map((opt, idx) => (
+                    <Text key={idx} style={{ marginLeft: 12 }}>
+                      • {opt}
+                    </Text>
+                  ))}
+                </View>
+              );
+            });
+          })()}
         </View>
       ) : (
         <Text>No entry for this date yet.</Text>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     width: "95%",
-    alignItems: "stretch",
     alignSelf: "center",
+  },
+  contentContainer: {
+    alignItems: "stretch",
+    paddingBottom: 20,
   },
   headerText: {
     textAlign: "center",
@@ -324,7 +347,7 @@ const styles = StyleSheet.create({
   },
   portraitContent: {
     width: "100%",
-    maxHeight: "60%",
+    maxHeight: "70%",
   },
   landscapeContent: {
     width: "100%",

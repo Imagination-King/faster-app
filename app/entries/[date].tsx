@@ -3,8 +3,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { CheckboxGroup } from "../../components/CheckboxGroup";
+import { levelOptions } from "../../data/levelOptions";
 import { useOrientation } from "../../hooks/useOrientation";
-import { CheckboxGroup } from "./CheckboxGroup";
 
 interface FormValues {
   checkboxGroup: string[];
@@ -16,32 +18,8 @@ type StoredEntry = {
   createdAt: string;
 };
 
-function makeOption(label: string, level: string) {
-  return {
-    label,
-    value: `${level}-${label}`,
-    level,
-  };
-}
-
-const levelOptions = [
-  makeOption("No current secrets", "G"),
-  makeOption("Working to solve problems", "G"),
-  makeOption("Secrets", "F"),
-  makeOption("Sarcasm", "F"),
-  makeOption("Being Resentful", "A"),
-  makeOption("Perfectionism", "A"),
-  makeOption("Feeling Driven", "S"),
-  makeOption("Irritable", "S"),
-  makeOption("Increasing Sarcasm", "T"),
-  makeOption("Feeling Alone", "T"),
-  makeOption("Depressed", "E"),
-  makeOption("Panicked", "E"),
-  makeOption("Out of Control", "R"),
-  makeOption("Giving Up and Giving In", "R"),
-];
-
 export default function EntryForm() {
+  const insets = useSafeAreaInsets();
   const { date } = useLocalSearchParams();
   const router = useRouter();
   const orientation = useOrientation();
@@ -102,7 +80,12 @@ export default function EntryForm() {
         styles.container,
         orientation === "landscape" && styles.landscapeContainer,
       ]}
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { flexGrow: 1, paddingBottom: insets.bottom + 20 },
+      ]}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
     >
       <Text style={styles.formTitle}>FASTER Scale</Text>
 
