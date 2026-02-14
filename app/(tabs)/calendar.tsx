@@ -1,12 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, Text, UIManager, View } from "react-native";
+import {
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  UIManager,
+  View,
+} from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useOrientation } from "../../hooks/useOrientation";
-
-// prettier-ignore
-const MONTHS = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
+import { formatDate } from "../../utils/dateFormatting";
 
 const order = ["G", "F", "A", "S", "T", "E", "R"];
 function lowestLetter(levels: string[]) {
@@ -43,7 +50,10 @@ export default function CalendarPage() {
 
   // Enable LayoutAnimation on Android, animate orientation changes
   useEffect(() => {
-    if(Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental){
+    if (
+      Platform.OS === "android" &&
+      UIManager.setLayoutAnimationEnabledExperimental
+    ) {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, []);
@@ -54,7 +64,7 @@ export default function CalendarPage() {
   }, [orientation]);
 
   const localToday = `${today.getFullYear()}-${String(
-    today.getMonth() + 1
+    today.getMonth() + 1,
   ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   const [selectedDate, setSelectedDate] = useState(localToday);
@@ -78,33 +88,11 @@ export default function CalendarPage() {
       }
 
       loadEntries();
-    }, [])
+    }, []),
   );
 
   // pull entry for current date
   const currentEntry = entries[selectedDate];
-
-  // convert date from YYYY-MM-DD to MMM DD, YYYY
-  function formatDate(
-    input: string | { year: number; month: number; day: number }
-  ) {
-    let year, month, day;
-
-    if (typeof input === "string") {
-      // parse "YYYY-MM-DD"
-      const parts = input.split("-");
-      if (parts.length !== 3) return input; // fallback
-      year = Number(parts[0]);
-      month = Number(parts[1]);
-      day = Number(parts[2]);
-    } else if (input && typeof input === "object") {
-      ({ year, month, day } = input);
-    } else {
-      return "";
-    }
-
-    return `${MONTHS[month - 1]} ${String(day).padStart(2, "0")}, ${year}`;
-  }
 
   // Convert values from saved entry back to normal text
   function prettyLabel(level: string) {
@@ -138,7 +126,7 @@ export default function CalendarPage() {
       >
         <Calendar
           style={styles.calendar}
-          hideExtraDays={true}
+          enableSwipeMonths={true}
           // overide default styles from Calendar
           theme={{
             "stylesheet.calendar.main": {
@@ -150,14 +138,27 @@ export default function CalendarPage() {
               },
             },
           }}
-          dayComponent={({ date }) => {
+          dayComponent={({ date, state }) => {
             if (!date) return null;
             const isSelected = date.dateString === selectedDate;
             const entry = entries[date.dateString];
+            const isExtraDay = state === "disabled";
             // grab first letter of entry
             const letter = entry ? lowestLetter(entry.levels) : "";
             // prettier-ignore
             if (__DEV__) { console.log("Day:",date.dateString,"Letter:",letter,"Levels:",entry?.levels); }
+
+            const levelColors: Record<string, string> = {
+              // placeholder colors, will adjust later for better palette
+              G: "#6FCF97",
+              F: "#F6A623",
+              A: "#F63B3B",
+              S: "#50E3C2",
+              T: "#B388FF",
+              E: "#F8E71C",
+              R: "#FF6B6B",
+            };
+            const badgeColor = letter ? levelColors[letter] : undefined;
 
             return (
               <Pressable
@@ -168,19 +169,33 @@ export default function CalendarPage() {
                   style={[
                     styles.dayText,
                     isSelected && styles.selectedDateText,
+                    isExtraDay && styles.extraDayText,
                   ]}
                 >
                   {date.day}
                 </Text>
 
-                <Text
-                  style={[
-                    styles.symbolText,
-                    isSelected && styles.selectedSymbolText,
-                  ]}
-                >
-                  {letter}
-                </Text>
+                {letter ? (
+                  <View
+                    style={[
+                      styles.symbolBadge,
+                      isExtraDay && styles.extraSymbolBadge,
+                      !isExtraDay && { backgroundColor: badgeColor },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.symbolText,
+                        isSelected && styles.selectedSymbolText,
+                        isExtraDay && styles.extraSymbolText,
+                      ]}
+                    >
+                      {letter}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.emptyBadge} />
+                )}
               </Pressable>
             );
           }}
@@ -286,23 +301,49 @@ const styles = StyleSheet.create({
   },
   calendar: {
     width: "100%",
+    paddingBottom: 5,
   },
   dayContainer: {
     width: "100%",
     height: 60,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    padding: 2,
     borderWidth: 0.5,
     borderColor: "gray",
   },
   dayText: {
     fontSize: 16,
     color: "#000",
+    marginBottom: -1,
   },
   symbolText: {
     fontSize: 12,
-    color: "#3b82f6", // blue placeholder, adjust later
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "center",
+    textAlignVertical: "center",
+    marginTop: -1,
+    marginRight: -1,
+  },
+  symbolBadge: {
+    width: 25,
+    height: 25,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 2,
+  },
+  emptyBadge: {
+    width: 25,
+    height: 25,
+    marginTop: 2,
+  },
+  // selectedSymbolBadge: {
+  //   backgroundColor: "#2b6ef6",
+  // },
+  extraSymbolBadge: {
+    backgroundColor: "#e0e0e0",
   },
   selectedDate: {
     backgroundColor: "#77aafdff",
@@ -310,7 +351,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 60,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   selectedDateText: {
     color: "#fff",
@@ -320,6 +361,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  extraDayText: {
+    color: "#bdbdbd",
+  },
+  extraSymbolText: {
+    color: "#9e9e9e",
   },
   newEntryButton: {
     backgroundColor: "#007bff",

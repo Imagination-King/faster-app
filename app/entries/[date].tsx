@@ -1,6 +1,7 @@
+import { formatDate } from "@/utils/dateFormatting";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,6 +23,7 @@ export default function EntryForm() {
   const insets = useSafeAreaInsets();
   const { date } = useLocalSearchParams();
   const router = useRouter();
+  const navigation = useNavigation();
   const orientation = useOrientation();
   const { control, handleSubmit, reset } = useForm<FormValues>({
     mode: "all",
@@ -50,6 +52,7 @@ export default function EntryForm() {
     if (date) loadData();
   }, [date, reset]);
 
+  // Save data to AsyncStorage on form submission
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const selectedOptions = data.checkboxGroup;
     const shortendedLevels = selectedOptions.map((item) => item.charAt(0));
@@ -67,12 +70,31 @@ export default function EntryForm() {
         : {};
       entries[date as string] = newEntry;
       await AsyncStorage.setItem("entries", JSON.stringify(entries));
-      router.replace("/calendar");
       console.log("Submitted:", data);
+      router.back();
     } catch (error) {
       console.error("Error saving entry:", error);
     }
   };
+
+  // this could be done inside useLayoutEffect but this way prevents unnecessary re-renders
+  const submitButton = useCallback(() => {
+    handleSubmit(onSubmit)();
+  }, [handleSubmit, onSubmit]);
+
+  // Header configuration with dynamic title and save button
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: date ? `Edit Entry - ${formatDate(date as string)}` : "New Entry",
+      headerRight: () => (
+        <Pressable onPress={submitButton} style={{ paddingHorizontal: 12 }}>
+          <Text style={{ color: "#007AFF", fontWeight: "bold" }}>
+            Save Entry
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation, submitButton]);
 
   return (
     <ScrollView
