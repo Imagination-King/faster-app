@@ -1,7 +1,13 @@
 import { Checkbox } from "expo-checkbox";
 import React from "react";
 import { Control, Controller } from "react-hook-form";
-import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { LevelOption } from "../data/levelOptions";
 import { useOrientation } from "../hooks/useOrientation";
 
@@ -46,7 +52,11 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   // build ordered sections for rendering
   const sections = order
     .filter((lvl) => grouped[lvl] && grouped[lvl].length > 0)
-    .map((lvl) => ({ key: lvl, title: prettyLabel[lvl] ?? lvl, data: grouped[lvl] }));
+    .map((lvl) => ({
+      key: lvl,
+      title: prettyLabel[lvl] ?? lvl,
+      data: grouped[lvl],
+    }));
 
   // Dynamically choose columns based on available screen width.
   const { width: windowWidth } = useWindowDimensions();
@@ -59,7 +69,10 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
   // estimate max columns that could fit given MIN_ITEM_WIDTH, then pick the largest
   // columns value (c) such that computed item width >= MIN_ITEM_WIDTH
-  const maxEstimate = Math.max(1, Math.floor((availableWidth + ITEM_GUTTER) / (MIN_ITEM_WIDTH + ITEM_GUTTER)));
+  const maxEstimate = Math.max(
+    1,
+    Math.floor((availableWidth + ITEM_GUTTER) / (MIN_ITEM_WIDTH + ITEM_GUTTER)),
+  );
   let columns = 1;
   for (let c = Math.min(maxEstimate, 6); c >= 1; c--) {
     const totalGutters = ITEM_GUTTER * (c - 1);
@@ -84,7 +97,8 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
         control={control}
         rules={{
           validate: (value) =>
-            (Array.isArray(value) && value.length > 0) || "Please select at least 1",
+            (Array.isArray(value) && value.length > 0) ||
+            "Please select at least 1",
         }}
         render={({ field, fieldState }) => (
           <View>
@@ -102,38 +116,66 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
                 >
                   {section.data.map((opt) => {
                     const checked =
-                      Array.isArray(field.value) && field.value.includes(opt.value);
+                      Array.isArray(field.value) &&
+                      field.value.includes(opt.value);
+
+                    const handleToggle = () => {
+                      const current = Array.isArray(field.value)
+                        ? field.value
+                        : [];
+                      const newValue = checked
+                        ? current.filter((v: string) => v !== opt.value)
+                        : [...current, opt.value];
+                      field.onChange(newValue);
+                    };
 
                     return (
-                      <View
+                      <Pressable
                         key={`${opt.value}-${opt.label}`}
-                        style={[
+                        onPress={handleToggle}
+                        style={({ pressed }) => [
                           styles.option,
                           {
                             flexBasis: `${100 / columns}%`,
                             maxWidth: `${100 / columns}%`,
                             minHeight: ITEM_MIN_HEIGHT,
-                            paddingVertical: 6,
+                            paddingVertical: 10,
+                            backgroundColor: pressed
+                              ? "#e6f0ff"
+                              : "transparent",
+                            borderRadius: 8,
                           },
                         ]}
                       >
-                        <View style={styles.checkboxWrapper}>
+                        <View
+                          style={styles.checkboxWrapper}
+                          pointerEvents="none"
+                        >
                           <Checkbox
                             value={checked}
-                            onValueChange={(newChecked) => {
-                              const current = Array.isArray(field.value) ? field.value : [];
-                              const newValue = newChecked
-                                ? [...current, opt.value]
-                                : current.filter((v: string) => v !== opt.value);
-                              field.onChange(newValue);
-                            }}
+                            // onValueChange={(newChecked) => {
+                            //   const current = Array.isArray(field.value)
+                            //     ? field.value
+                            //     : [];
+                            //   const newValue = newChecked
+                            //     ? [...current, opt.value]
+                            //     : current.filter(
+                            //         (v: string) => v !== opt.value,
+                            //       );
+                            //   field.onChange(newValue);
+                            // }}
                           />
                         </View>
 
-                        <Text style={[styles.optionLabel, { lineHeight: LINE_HEIGHT }]}>
+                        <Text
+                          style={[
+                            styles.optionLabel,
+                            { lineHeight: LINE_HEIGHT },
+                          ]}
+                        >
                           {opt.label}
                         </Text>
-                      </View>
+                      </Pressable>
                     );
                   })}
                 </View>
@@ -188,9 +230,9 @@ const styles = StyleSheet.create({
   },
   option: {
     flexDirection: "row",
-    alignItems: "center", // center checkbox vertically relative to the reserved height
+    alignItems: "flex-start", // center checkbox vertically relative to the reserved height
     paddingHorizontal: 8,
-    marginBottom: 12,
+    marginBottom: 4,
   },
   // wrapper to ensure checkbox stays centered and doesn't affect text flow
   checkboxWrapper: {
