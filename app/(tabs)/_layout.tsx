@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
+import { TouchableOpacity } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -10,12 +11,28 @@ export default function TabLayout() {
         tabBarInactiveTintColor: "#666",
         tabBarActiveBackgroundColor: "#e6f0ff",
         tabBarInactiveBackgroundColor: "#f9f9f9",
+        headerRight: () => (
+          <>
+            <TouchableOpacity
+              onPress={() => router.push("/about")}
+              style={{ paddingRight: 16 }}
+            >
+              <Ionicons name="help-circle-outline" size={24} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/settings")}
+              style={{ paddingRight: 16 }}
+            >
+              <Ionicons name="settings-outline" size={24} />
+            </TouchableOpacity>
+          </>
+        ),
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "HOME",
+          title: "Welcome",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" color={color} size={size ?? 24} />
           ),
@@ -24,7 +41,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: "CALENDAR",
+          title: "Calendar",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" color={color} size={size ?? 24} />
           ),
@@ -33,7 +50,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="share"
         options={{
-          title: "SHARE",
+          title: "Share",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="share-social" color={color} size={size ?? 24} />
           ),
