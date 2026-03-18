@@ -3,11 +3,11 @@
 npx expo start = launch build environment
 eas build --platform android --profile test = build installable apk
 adb logcat \*:S ReactNative:V ReactNativeJS:V = debug apk
+
+Ctrl + Shift + V to preview Markdown
 -->
 
 # FASTER Scale Mobile App
-
-![Welcome Screen](screenshots/home.jpg)
 
 _This app is based off of the FASTER Scale created by Pure Desire Ministries. I am not affiliated in any way with Pure Desire, and the content of this app has not been officially licensed or endorsed by Pure Desire (yet)._
 
@@ -45,11 +45,14 @@ Planned
   <li> Share your progress with whoever you want
   <li> Review entries of those who have shared with you
   <li> Export individual entries as PDFs
-  <ul>
-    <li> Export entire month or year as PDF?
-  </ul>
+  <li> Export entire month or year as PDF?
   <li> Additional features as I think of them
-<ul>
+</ul>
+
+## Known Bugs
+
+- Home page does not reflect changes to User Name property in settings
+- RBG sliders don't like to stay in place when manually moved, unless set to 0 or 255
 
 ## Feedback
 
@@ -59,10 +62,14 @@ Planned
 
 ## Screenshots
 
-![Calendar page with no entry in default portrait mode](screenshots/calendar-emptyForm.jpg)
+<img src="screenshots/home.jpg" width="500">
 
-![Calendar page with entry in default portrait mode](screenshots/calendar-portrait.jpg)
+<img src="screenshots/calendar-emptyForm.jpg" width="500">
 
-![Calendar page with entry in landscape mode](screenshots/calendar-landscape.jpg)
+<img src="screenshots/calendar-portrait.jpg" width="500">
 
-![Calendar page with entry in landscape mode](screenshots/settings.jpg)
+<img src="screenshots/calendar-landscape.jpg" width="500">
+
+<img src="screenshots/settings.jpg" width="500">
+
+<img src="screenshots/settings-colorPicker.jpg" width="500">
