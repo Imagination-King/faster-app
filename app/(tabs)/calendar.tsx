@@ -20,12 +20,7 @@ import { useSettings } from "../../hooks/useSettings";
 import { formatDate } from "../../utils/dateFormatting";
 import { ORDER } from "../constants/levels";
 import { styles } from "../styles/calendarStyles";
-
-type StoredEntry = {
-  levels: string[];
-  options: string[];
-  createdAt: string;
-};
+import { StoredEntry } from "../../types/entry";
 
 // --- 1. LOCAL TIME FIX ---
 const getLocalISODate = () => {

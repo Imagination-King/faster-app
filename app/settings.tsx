@@ -16,8 +16,13 @@ import { LEVEL_LABELS, ORDER, PRESET_COLORS } from "./constants/levels";
 import { styles } from "./styles/settingsPageStyles";
 
 export default function SettingsPage() {
-  const { settings, updateUserName, updateLevelColor, resetColors } =
-    useSettings();
+  const {
+    settings,
+    updateUserName,
+    updateLevelColor,
+    resetColors,
+    updateFormLayout,
+  } = useSettings();
   const [userName, setUserName] = useState("");
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [colorState, setColorState] = useState({ r: 0, g: 0, b: 0 });
@@ -73,6 +78,61 @@ export default function SettingsPage() {
         >
           <Text style={styles.buttonText}>Save Name</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Form Layout</Text>
+        <Text style={styles.layoutDescription}>
+          Choose how the FASTER entry form is divided into pages.
+        </Text>
+        {(
+          [
+            {
+              value: "single-page",
+              title: "Everything on one page",
+              description:
+                "Show each level's questions directly below its checkboxes.",
+            },
+            {
+              value: "questions-page",
+              title: "Checkboxes, then questions",
+              description:
+                "Put all level checkboxes on one page and all questions on another.",
+            },
+            {
+              value: "level-pages",
+              title: "One page per level",
+              description:
+                "Give each FASTER level its own page with checkboxes and questions.",
+            },
+          ] as const
+        ).map((option) => {
+          const selected = settings.formLayout === option.value;
+          return (
+            <TouchableOpacity
+              key={option.value}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              style={[
+                styles.layoutOption,
+                selected && styles.selectedLayoutOption,
+              ]}
+              onPress={() => updateFormLayout(option.value)}
+            >
+              <View style={styles.layoutOptionText}>
+                <Text style={styles.layoutOptionTitle}>{option.title}</Text>
+                <Text style={styles.layoutOptionDescription}>
+                  {option.description}
+                </Text>
+              </View>
+              <Ionicons
+                name={selected ? "radio-button-on" : "radio-button-off"}
+                size={22}
+                color={selected ? "#007bff" : "#777"}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       {/* Level Colors Section */}

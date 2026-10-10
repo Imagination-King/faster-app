@@ -40,6 +40,34 @@ export const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 12,
   },
+  layoutDescription: {
+    color: "#666",
+    marginBottom: 8,
+  },
+  layoutOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  selectedLayoutOption: {
+    backgroundColor: "#f5f9ff",
+  },
+  layoutOptionText: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  layoutOptionTitle: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  layoutOptionDescription: {
+    color: "#666",
+    fontSize: 13,
+    marginTop: 4,
+  },
 
   // Form Elements (like buttons and inputs)
   input: {

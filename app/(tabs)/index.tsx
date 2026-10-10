@@ -35,6 +35,11 @@ export default function Index() {
 
         {/* Buttons Section */}
         <View style={[styles.buttonBlock, isLandscape && { flex: 1 }]}>
+          {/* <ActionCard
+            title="You're using Expo Go"
+            subtitle="Please comment out this card when building"
+            onPress={() => null}
+          /><*/ }
           <ActionCard
             title="What is this app?"
             subtitle="Learn how to use this app and about the FASTER Scale itself"

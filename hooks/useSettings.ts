@@ -2,10 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
 export type LevelColors = Record<string, string>;
+export type FormLayout = "single-page" | "questions-page" | "level-pages";
 
 export interface AppSettings {
   userName: string;
   levelColors: LevelColors;
+  formLayout: FormLayout;
 }
 
 const DEFAULT_LEVEL_COLORS: LevelColors = {
@@ -21,6 +23,7 @@ const DEFAULT_LEVEL_COLORS: LevelColors = {
 const DEFAULT_SETTINGS: AppSettings = {
   userName: "",
   levelColors: DEFAULT_LEVEL_COLORS,
+  formLayout: "single-page",
 };
 
 const SETTINGS_KEY = "appSettings";
@@ -39,6 +42,11 @@ export function useSettings() {
           setSettings({
             userName: parsed.userName || "",
             levelColors: { ...DEFAULT_LEVEL_COLORS, ...parsed.levelColors },
+            formLayout:
+              parsed.formLayout === "questions-page" ||
+              parsed.formLayout === "level-pages"
+                ? parsed.formLayout
+                : "single-page",
           });
         }
       } catch (error) {
@@ -74,11 +82,16 @@ export function useSettings() {
     await updateSettings({ levelColors: DEFAULT_LEVEL_COLORS });
   };
 
+  const updateFormLayout = async (formLayout: FormLayout) => {
+    await updateSettings({ formLayout });
+  };
+
   return {
     settings,
     isLoading,
     updateUserName,
     updateLevelColor,
     resetColors,
+    updateFormLayout,
   };
 }

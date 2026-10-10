@@ -1,5 +1,5 @@
 import { Checkbox } from "expo-checkbox";
-import React from "react";
+import React, { ReactNode } from "react";
 import { Control, Controller } from "react-hook-form";
 import {
   Pressable,
@@ -17,6 +17,10 @@ interface CheckboxGroupProps {
   label?: string;
   options: LevelOption[];
   row?: boolean;
+  renderSectionFooter?: (
+    level: string,
+    checkedOptions: LevelOption[],
+  ) => ReactNode;
 }
 
 export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
@@ -25,6 +29,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   label,
   options,
   row,
+  renderSectionFooter,
 }) => {
   const orientation = useOrientation();
   const shouldUseRow = row && orientation !== "landscape";
@@ -179,6 +184,17 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
                     );
                   })}
                 </View>
+
+                {renderSectionFooter ? (
+                  renderSectionFooter(
+                    section.key,
+                    section.data.filter(
+                      (option) =>
+                        Array.isArray(field.value) &&
+                        field.value.includes(option.value),
+                    ),
+                  )
+                ) : null}
 
                 <View style={styles.sectionSeparator} />
               </View>
